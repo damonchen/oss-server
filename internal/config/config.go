@@ -10,8 +10,8 @@ type AliOSS struct {
 
 // TencentOSS tencent oss
 type TencentOSS struct {
-	APIKey     string `yaml:"apiKey"`
-	APISecret  string `yaml:"apiSecret"`
+	SecretID   string `yaml:"apiId"`
+	SecretKey  string `yaml:"apiKey"`
 	BucketName string `yaml:"bucket"`
 	Region     string `yaml:"region"`
 }
@@ -19,7 +19,7 @@ type TencentOSS struct {
 // Auth auth for request
 type ProxyAuth struct {
 	// 认证服务器地址，http或https协议
-	AuthServer string `yaml:"authServer"`
+	AuthPath string `yaml:"authPath"`
 }
 
 // BasicAuth basic auth
@@ -38,7 +38,9 @@ type Auth struct {
 
 // Configuration configuration
 type Configuration struct {
-	AliOSS     AliOSS     `yaml:"alioss,omitempty"`
-	TencentOSS TencentOSS `yaml:"alioss,omitempty"`
-	Auth       Auth       `yaml:"alioss,omitempty"`
+	Port       string     `yaml:"port"`
+	Providers  []string   `yaml:"providers"`
+	AliOSS     AliOSS     `yaml:"aliyun,omitempty"`
+	TencentOSS TencentOSS `yaml:"tencent,omitempty"`
+	Auth       Auth       `yaml:"auth,omitempty"`
 }

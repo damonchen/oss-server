@@ -7,10 +7,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func newRootCmd(cfg *config.Configuration, out io.Writer, args []string) (*cobra.Command, error) {
+func newRootCmd(cfg *config.Configuration, outer io.Writer, args []string) (*cobra.Command, error) {
 	cmd := &cobra.Command{
 		Use:          "osv",
-		Short:        "oss server for aliyun and tencent",
+		Short:        "oss server for aliyun and tencent oss, etc.",
 		SilenceUsage: true,
 	}
 
@@ -22,6 +22,8 @@ func newRootCmd(cfg *config.Configuration, out io.Writer, args []string) (*cobra
 	}
 
 	cmd.AddCommand(
-		newVersionCmd(out))
+		newWebCmd(cfg, outer, args),
+		newVersionCmd(outer),
+	)
 	return cmd, nil
 }

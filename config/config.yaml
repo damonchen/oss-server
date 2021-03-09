@@ -1,0 +1,31 @@
+# listen server port
+port: 8092
+providers:
+  # - aliyun
+  - tencent
+
+# 阿里云 oss
+aliyun:
+  apiKey:
+  apiSecret:
+  bucket:
+  region:
+
+
+# 腾讯云 oss
+tencent:
+  apiId:
+  apiKey:
+  bucket:
+  region:
+
+
+# 认证
+auth:
+  # type为：none，basic, proxy
+  type: 'none'
+  # 当type为proxy时存在，为认证的后端地址，会向该地址发送http的GET请求，转发
+  authPath:
+  # 当type为basic时存在
+  name:
+  password:
