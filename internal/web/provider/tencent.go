@@ -3,12 +3,12 @@ package provider
 import (
 	"context"
 	"fmt"
+	"github.com/damonchen/oss-server/internal/web/utils"
+	"github.com/tencentyun/cos-go-sdk-v5"
 	"io"
 	"net/http"
 	"net/url"
 	"strings"
-
-	"github.com/tencentyun/cos-go-sdk-v5"
 
 	"github.com/damonchen/oss-server/internal/config"
 )
@@ -53,19 +53,18 @@ func (proxy *TencentProxy) Name() string {
 }
 
 func (proxy *TencentProxy) Handle(w http.ResponseWriter, req *http.Request) {
-	paths := req.URL.Query()["path"]
-	if len(paths) == 0 {
-		log.Error("tencent proxy path is empty")
+	path, err := utils.GetRequestPath(req)
+	if err != nil {
+		log.Errorf("request path error %s", err)
 		w.WriteHeader(500)
 		return
 	}
 
-	path := strings.TrimSpace(paths[0])
-	if len(path) == 0 {
-		log.Error("tencent proxy path is empty string")
-		w.WriteHeader(500)
-		return
+	if !strings.HasPrefix(path, "/") {
+		path = "/" + path
 	}
+
+	log.Debugf("will get tencent path: %+v", path)
 
 	c := proxy.client
 	resp, err := c.Object.Get(context.Background(), path, nil)

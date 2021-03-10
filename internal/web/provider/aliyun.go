@@ -2,6 +2,7 @@ package provider
 
 import (
 	"fmt"
+	"github.com/damonchen/oss-server/internal/web/utils"
 	"io"
 	"net/http"
 	"strings"
@@ -42,27 +43,20 @@ type AliyunProxy struct {
 }
 
 func (proxy *AliyunProxy) Handle(w http.ResponseWriter, req *http.Request) {
+	path, err := utils.GetRequestPath(req)
+	if err != nil {
+		log.Errorf("request path error %s", err)
+		w.WriteHeader(500)
+		return
+	}
+	path = strings.TrimPrefix(path, "/")
+
 	bucket, err := proxy.client.Bucket(proxy.bucket)
 	if err != nil {
 		log.Errorf("get bucket %s error %s", proxy.bucket, err)
 		w.WriteHeader(500)
 	}
 
-	paths := req.URL.Query()["path"]
-	if len(paths) == 0 {
-		log.Error("aliyun proxy path is empty")
-		w.WriteHeader(500)
-		return
-	}
-
-	path := strings.TrimSpace(paths[0])
-	if len(path) == 0 {
-		log.Error("aliyun proxy path is empty string")
-		w.WriteHeader(500)
-		return
-	}
-
-	path = strings.TrimPrefix(path, "/")
 	body, err := bucket.GetObject(path)
 	if err != nil {
 		log.Errorf("download bucket %s file %s error %s", proxy.bucket, path, err)

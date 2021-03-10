@@ -46,8 +46,6 @@ func (svr *Server) Run() error {
 
 	r := NewRouter(svr)
 
-
-
 	var port string
 	if svr.Cfg.Host == "0.0.0.0" {
 		port = fmt.Sprintf(":%s", svr.Cfg.Port)
