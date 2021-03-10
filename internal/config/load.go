@@ -23,6 +23,11 @@ func Load(fileName string) (*Configuration, error) {
 		log.Errorf("load yaml config error %s", err)
 		return nil, err
 	}
-	
+
+	// TODO: default config
+	if cfg.Host == "" {
+		cfg.Host = "127.0.0.1"
+	}
+
 	return &cfg, nil
 }

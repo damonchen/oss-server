@@ -40,6 +40,7 @@ type Auth struct {
 
 // Configuration configuration
 type Configuration struct {
+	Host      string    `yaml:"host,omitempty"`
 	Port      string    `yaml:"port,omitempty"`
 	Providers []string  `yaml:"providers"`
 	Aliyun    []Aliyun  `yaml:"aliyun,omitempty"`

@@ -46,9 +46,16 @@ func (svr *Server) Run() error {
 
 	r := NewRouter(svr)
 
-	log.Infof("start listen port: %s", svr.Cfg.Port)
 
-	port := fmt.Sprintf(":%s", svr.Cfg.Port)
+
+	var port string
+	if svr.Cfg.Host == "0.0.0.0" {
+		port = fmt.Sprintf(":%s", svr.Cfg.Port)
+	} else {
+		port = fmt.Sprintf("%s:%s", svr.Cfg.Host, svr.Cfg.Port)
+	}
+
+	log.Infof("start listen to %s", port)
 	return http.ListenAndServe(port, r)
 }
 
