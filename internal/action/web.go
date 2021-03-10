@@ -11,13 +11,12 @@ type Web struct {
 }
 
 func (web *Web) Run() error {
-	if web.Config == nil {
-		web.Config = &config.Configuration{}
-	}
-	err := config.Load(web.CfgFile, web.Config)
+	cfg, err := config.Load(web.CfgFile)
 	if err != nil {
 		return err
 	}
+
+	web.Config = cfg
 
 	return web.serverRun()
 }

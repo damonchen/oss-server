@@ -42,6 +42,8 @@ func (svr *Server) Run() error {
 		provider.RegisterProxyProvider(pvd, proxyProvider)
 	}
 
+	log.Infof("support web providers %s", provider.GetSupportProviders())
+
 	r := NewRouter(svr)
 
 	log.Infof("start listen port: %s", svr.Cfg.Port)
@@ -52,24 +54,37 @@ func (svr *Server) Run() error {
 
 func (svr *Server) Handle(w http.ResponseWriter, req *http.Request) {
 	pvd := chi.URLParam(req, "provider")
+	log.Debugf("svr handle, provider %s", pvd)
 	if pvd == "" {
 		log.Fatalf("provider is empty")
 		w.WriteHeader(500)
+		return
 	}
 
 	if !provider.IsSupportProvider(pvd) {
 		log.Fatalf("not support provider %s provide", pvd)
 		w.WriteHeader(500)
+		return
 	}
 
 	proxyProvider := provider.GetProxyProvider(pvd)
+	if proxyProvider == nil {
+		log.Fatalf("proxy provider is nil")
+		w.WriteHeader(500)
+		return
+	}
+	log.Infof("we get the proxy provider %s", proxyProvider)
+
 	proxyProvider.Handle(w, req)
+	log.Debug("proxy handle complete")
+	return
 }
 
 func (svr *Server) Auth(next http.Handler) http.Handler {
 	auth := svr.Cfg.Auth
 	var isNoneAuth = auth.Type == "none" || auth.Type == ""
 	var isBasicAuth = auth.Type == "basic"
+	log.Debugf("auth type: %s\n", auth.Type)
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		// 判定下是否已经认证通过了
 		if isNoneAuth {
