@@ -1,31 +1,48 @@
 # listen server port
 port: 8092
+
+# 支持的provider，只有此处先添加了，下面的aliyun,tencent才会生效
 providers:
-  # - aliyun
+  - aliyun
   - tencent
 
 # 阿里云 oss
 aliyun:
-  apiKey:
-  apiSecret:
-  bucket:
-  region:
+  # 名称，url路径中用来表示，在所有的provider中，必须要保持唯一
+  - name: 'assets'
+    # oss的 accessKeyId
+    apiId:
+    # oss的 accessKeySecret
+    apiKey:
+    # oss中的桶信息
+    bucket:
+    # 区域，默认一般为，会作为endpoint的前缀
+    region: oss-cn-hangzhou
 
 
 # 腾讯云 oss
 tencent:
-  apiId:
-  apiKey:
-  bucket:
-  region:
+  # 名称，url路径中用来表示，在所有的provider中，必须要保持唯一
+  - name: 'tagtag'
+    # oss的 apiId
+    apiId:
+    # oss的 apiKey
+    apiKey:
+    # 桶信息
+    bucket:
+    # 区域信息
+    region:
 
 
 # 认证
 auth:
   # type为：none，basic, proxy
   type: 'none'
-  # 当type为proxy时存在，为认证的后端地址，会向该地址发送http的GET请求，转发
+  # 当type为proxy时存在，为认证的后端地址，会向该地址发送http|https的GET请求，并要求返回的结构为 `{"status":bool,"message":""}`
+  # 当status为false时，message中为错误信息
   authPath:
   # 当type为basic时存在
+  # basic的name
   name:
+  # basic的password
   password:

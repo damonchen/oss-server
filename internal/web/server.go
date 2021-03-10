@@ -29,17 +29,17 @@ func (svr *Server) Run() error {
 	// create provider server client
 	for _, pvd := range svr.Cfg.Providers {
 		if !provider.IsSupportProvider(pvd) {
-			log.Fatalf("not support provider %s provide", pvd)
+			log.Errorf("not support provider %s provide", pvd)
 			return errors.Errorf("not support provider %s", pvd)
 		}
 
 		factory := provider.GetFactory(pvd)
 		if factory == nil {
-			log.Fatalf("not support provider %s provide", pvd)
+			log.Errorf("not support provider %s provide", pvd)
 			return errors.Errorf("not support provider %s", pvd)
 		}
-		proxyProvider := factory.Create(svr.Cfg)
-		provider.RegisterProxyProvider(pvd, proxyProvider)
+		proxyProviders := factory.Create(svr.Cfg)
+		provider.RegisterProxyProvider(proxyProviders)
 	}
 
 	log.Infof("support web providers %s", provider.GetSupportProviders())
@@ -56,27 +56,25 @@ func (svr *Server) Handle(w http.ResponseWriter, req *http.Request) {
 	pvd := chi.URLParam(req, "provider")
 	log.Debugf("svr handle, provider %s", pvd)
 	if pvd == "" {
-		log.Fatalf("provider is empty")
+		log.Error("provider is empty")
 		w.WriteHeader(500)
 		return
 	}
 
-	if !provider.IsSupportProvider(pvd) {
-		log.Fatalf("not support provider %s provide", pvd)
+	if !provider.IsSupportProxy(pvd) {
+		log.Errorf("not support provider %s provide", pvd)
 		w.WriteHeader(500)
 		return
 	}
 
 	proxyProvider := provider.GetProxyProvider(pvd)
 	if proxyProvider == nil {
-		log.Fatalf("proxy provider is nil")
+		log.Error("proxy provider is nil")
 		w.WriteHeader(500)
 		return
 	}
-	log.Infof("we get the proxy provider %s", proxyProvider)
 
 	proxyProvider.Handle(w, req)
-	log.Debug("proxy handle complete")
 	return
 }
 
@@ -95,7 +93,7 @@ func (svr *Server) Auth(next http.Handler) http.Handler {
 		if isBasicAuth {
 			name, password, ok := req.BasicAuth()
 			if !ok {
-				log.Fatalf("not supply correct basic auth")
+				log.Error("not supply correct basic auth")
 				w.WriteHeader(500)
 				return
 			}
@@ -111,7 +109,7 @@ func (svr *Server) Auth(next http.Handler) http.Handler {
 		err := proxyAuth(auth.ProxyAuth, w, req)
 		if err != nil {
 			log.Errorf("proxy auth failed: %s", err)
-			// 401错误
+			w.WriteHeader(401)
 		}
 
 		next.ServeHTTP(w, req)

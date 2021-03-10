@@ -13,15 +13,16 @@ var log = logging.MustGetLogger("provider")
 
 type ProxyProvider interface {
 	Handle(w http.ResponseWriter, req *http.Request)
+	Name() string
 }
 
 // Factory provider factory
 type Factory interface {
-	Create(cfg *config.Configuration) ProxyProvider
+	Create(cfg *config.Configuration) []ProxyProvider
 }
 
 var (
-	providers         = map[string]ProxyProvider{}
+	proxyProviders    = map[string]ProxyProvider{}
 	mutex             = sync.Mutex{}
 	providerFactories = map[string]Factory{}
 )
@@ -42,21 +43,33 @@ func GetSupportProviders() []string {
 	return pvds
 }
 
-func RegisterProxyProvider(name string, provider ProxyProvider) {
+func RegisterProxyProvider(providers []ProxyProvider) {
 	mutex.Lock()
 	defer mutex.Unlock()
 
-	providers[name] = provider
+	// TODO: 重名问题
+	for _, provider := range providers {
+		proxyProviders[provider.Name()] = provider
+	}
 }
 
 func GetProxyProvider(name string) ProxyProvider {
 	mutex.Lock()
 	defer mutex.Unlock()
-	return providers[name]
+	return proxyProviders[name]
 }
 
 func IsSupportProvider(name string) bool {
 	for key := range providerFactories {
+		if name == key {
+			return true
+		}
+	}
+	return false
+}
+
+func IsSupportProxy(name string) bool {
+	for key := range proxyProviders {
 		if name == key {
 			return true
 		}

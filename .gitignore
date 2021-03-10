@@ -17,3 +17,5 @@
 .idea/
 
 cmd/osv/osv
+
+config.yaml.sample

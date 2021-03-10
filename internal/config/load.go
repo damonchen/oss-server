@@ -23,8 +23,6 @@ func Load(fileName string) (*Configuration, error) {
 		log.Errorf("load yaml config error %s", err)
 		return nil, err
 	}
-
-	log.Debugf("load config content %+v", cfg)
-
+	
 	return &cfg, nil
 }
