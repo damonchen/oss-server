@@ -70,7 +70,7 @@ func (proxy *TencentProxy) Handle(w http.ResponseWriter, req *http.Request) {
 	resp, err := c.Object.Get(context.Background(), path, nil)
 	if err != nil {
 		log.Errorf("object get from tencent oss error %+v", err)
-		w.WriteHeader(500)
+		w.WriteHeader(404)
 		return
 	}
 	defer resp.Body.Close()

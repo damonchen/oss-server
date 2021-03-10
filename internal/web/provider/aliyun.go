@@ -60,7 +60,7 @@ func (proxy *AliyunProxy) Handle(w http.ResponseWriter, req *http.Request) {
 	body, err := bucket.GetObject(path)
 	if err != nil {
 		log.Errorf("download bucket %s file %s error %s", proxy.bucket, path, err)
-		w.WriteHeader(500)
+		w.WriteHeader(404)
 		return
 	}
 	defer body.Close()
