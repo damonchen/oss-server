@@ -2,13 +2,17 @@
 
 阿里云oss和腾讯云oss的反向代理
 
+## 目的：
+
+1. 简化oss访问的处理
+
 ## design
 
 ![image-20210310130540188](docs/assets/README/browser.png)
 
 
 
-![image-20210310130601585](docs/assets/README/logic-view.png)
+![image-20210310130601585](docs/assets/README/logic-view.jpg)
 
 
 
