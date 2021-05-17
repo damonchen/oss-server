@@ -3,12 +3,15 @@ package provider
 import (
 	"context"
 	"fmt"
-	"github.com/damonchen/oss-server/internal/web/utils"
-	"github.com/tencentyun/cos-go-sdk-v5"
 	"io"
 	"net/http"
 	"net/url"
+	"os"
+	"path/filepath"
 	"strings"
+
+	"github.com/damonchen/oss-server/internal/web/utils"
+	"github.com/tencentyun/cos-go-sdk-v5"
 
 	"github.com/damonchen/oss-server/internal/config"
 )
@@ -33,8 +36,9 @@ func (f tencent) Create(cfg *config.Configuration) []ProxyProvider {
 		})
 
 		proxy := &TencentProxy{
-			name:   tencent.Name,
-			client: client,
+			name:             tencent.Name,
+			client:           client,
+			defaultImagePath: tencent.DefaultImagePath,
 		}
 
 		proxyProviders = append(proxyProviders, proxy)
@@ -44,8 +48,9 @@ func (f tencent) Create(cfg *config.Configuration) []ProxyProvider {
 }
 
 type TencentProxy struct {
-	name   string
-	client *cos.Client
+	name             string
+	client           *cos.Client
+	defaultImagePath string
 }
 
 func (proxy *TencentProxy) Name() string {
@@ -69,8 +74,37 @@ func (proxy *TencentProxy) Handle(w http.ResponseWriter, req *http.Request) {
 	c := proxy.client
 	resp, err := c.Object.Get(context.Background(), path, nil)
 	if err != nil {
-		log.Errorf("object get from tencent oss error %+v", err)
-		w.WriteHeader(404)
+		// 当没有找到的时候，获取参数类型，然后返回默认的大小
+		typ, err := utils.GetRequestType(req)
+		if err != nil {
+			log.Errorf("object get from tencent oss error %+v", err)
+			w.WriteHeader(404)
+			return
+		}
+		typ = strings.ToLower(typ)
+		log.Debugf("tencent type %s", typ)
+		// 返回2倍图或者3倍图
+		var filename string
+		if typ == "icon" {
+			filename = filepath.Join(proxy.defaultImagePath, "user_icon_nor@2x.png")
+		} else if typ == "avatar" {
+			filename = filepath.Join(proxy.defaultImagePath, "user_head_nor@2x.png")
+		} else if typ == "head" {
+			filename = filepath.Join(proxy.defaultImagePath, "home_nor@2x.png")
+		} else {
+			log.Errorf("object get from tencent oss error %+v", err)
+			w.WriteHeader(404)
+			return
+		}
+
+		fp, err := os.Open(filename)
+		if err != nil {
+			log.Errorf("open file %s error %s", filename, err)
+			w.WriteHeader(500)
+			return
+		}
+		defer fp.Close()
+		_, _ = io.Copy(w, fp)
 		return
 	}
 	defer resp.Body.Close()

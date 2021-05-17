@@ -33,6 +33,7 @@ tencent:
     bucket:
     # 区域信息
     region:
+    defaultImagePath: /tmp/
 
 
 # 认证

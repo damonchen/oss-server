@@ -11,11 +11,12 @@ type Aliyun struct {
 
 // Tencent tencent oss
 type Tencent struct {
-	Name   string `yaml:"name"`
-	ApiID  string `yaml:"apiId"`
-	ApiKey string `yaml:"apiKey"`
-	Bucket string `yaml:"bucket"`
-	Region string `yaml:"region"`
+	Name             string `yaml:"name"`
+	ApiID            string `yaml:"apiId"`
+	ApiKey           string `yaml:"apiKey"`
+	Bucket           string `yaml:"bucket"`
+	Region           string `yaml:"region"`
+	DefaultImagePath string `yaml:"defaultImagePath"`
 }
 
 // Auth auth for request
