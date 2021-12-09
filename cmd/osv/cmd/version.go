@@ -1,11 +1,12 @@
-package main
+package cmd
 
 import (
 	"fmt"
-	"github.com/damonchen/oss-server/cmd/osv/require"
+	"io"
+
+	"github.com/damonchen/oss-server/cmd/osv/cmd/require"
 	"github.com/damonchen/oss-server/internal/version"
 	"github.com/spf13/cobra"
-	"io"
 )
 
 type versionOptions struct {

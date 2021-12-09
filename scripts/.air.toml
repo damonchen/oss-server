@@ -1,0 +1,14 @@
+root = "."
+tmp_dir = ".air"
+
+[build]
+  bin = "./.air/oss-server web --cfg config/config.yaml"
+  cmd = "go build -o ./.air/oss-server ./cmd/osv/main.go"
+  delay = 1000
+  exclude_dir = [".air", "vendor", "frontend", "docs"]
+  exclude_file = []
+  exclude_regex = []
+  exclude_unchanged = false
+  follow_symlink = false
+  full_bin = ""
+

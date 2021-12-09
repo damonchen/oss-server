@@ -1,13 +1,14 @@
-package main
+package cmd
 
 import (
-	"github.com/damonchen/oss-server/internal/config"
 	"io"
+
+	"github.com/damonchen/oss-server/internal/config"
 
 	"github.com/spf13/cobra"
 )
 
-func newRootCmd(cfg *config.Configuration, outer io.Writer, args []string) (*cobra.Command, error) {
+func NewRootCmd(cfg *config.Configuration, outer io.Writer, args []string) (*cobra.Command, error) {
 	cmd := &cobra.Command{
 		Use:          "osv",
 		Short:        "oss server for aliyun and tencent oss, etc.",

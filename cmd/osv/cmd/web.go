@@ -1,11 +1,12 @@
-package main
+package cmd
 
 import (
-	"github.com/damonchen/oss-server/cmd/osv/require"
+	"io"
+
+	"github.com/damonchen/oss-server/cmd/osv/cmd/require"
 	"github.com/damonchen/oss-server/internal/action"
 	"github.com/damonchen/oss-server/internal/config"
 	"github.com/spf13/cobra"
-	"io"
 )
 
 func newWebCmd(cfg *config.Configuration, outer io.Writer, args []string) *cobra.Command {

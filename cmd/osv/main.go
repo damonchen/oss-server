@@ -2,8 +2,10 @@ package main
 
 import (
 	"fmt"
-	"github.com/damonchen/oss-server/internal/config"
 	"os"
+
+	"github.com/damonchen/oss-server/cmd/osv/cmd"
+	"github.com/damonchen/oss-server/internal/config"
 )
 
 func debug(format string, v ...interface{}) {
@@ -18,7 +20,7 @@ func warning(format string, v ...interface{}) {
 
 func main() {
 	cfg := new(config.Configuration)
-	cmd, err := newRootCmd(cfg, os.Stdout, os.Args[1:])
+	cmd, err := cmd.NewRootCmd(cfg, os.Stdout, os.Args[1:])
 	if err != nil {
 		warning("%+v", err)
 		os.Exit(1)
