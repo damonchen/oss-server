@@ -112,6 +112,10 @@ func (proxy *TencentProxy) Handle(w http.ResponseWriter, req *http.Request) {
 	_, _ = io.Copy(w, resp.Body)
 }
 
+func (proxy *TencentProxy) Upload(w http.ResponseWriter, req *http.Request) {
+	// TODO:
+}
+
 func init() {
 	RegisterFactory("tencent", &tencent{})
 }

@@ -13,6 +13,7 @@ var log = logging.MustGetLogger("provider")
 
 type ProxyProvider interface {
 	Handle(w http.ResponseWriter, req *http.Request)
+	Upload(w http.ResponseWriter, req *http.Request)
 	Name() string
 }
 

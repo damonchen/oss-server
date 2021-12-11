@@ -5,6 +5,7 @@
 ## 目的：
 
 1. 简化oss访问的处理
+2. 支持oss的上传
 
 ## design
 
@@ -17,6 +18,13 @@
 
 
 ## usage
+
+可以在配置中修改，添加支持的provider，然后当前如果只有一个provider，则在url
+中可以省略prvoider的提供
+
+如果provider下只有一个name可以使用，则name同样可以省略。
+
+
 
 ```bash
 

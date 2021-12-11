@@ -3,9 +3,11 @@ host: '127.0.0.1'
 port: 8092
 
 # 支持的provider，只有此处先添加了，下面的aliyun,tencent才会生效
+# 只有一个provider的时候，url中无须提供provider
 providers:
-  - aliyun
-  - tencent
+  # - aliyun
+  # - tencent
+  - local
 
 # 阿里云 oss
 aliyun:
@@ -35,6 +37,12 @@ tencent:
     region:
     defaultImagePath: /tmp/
 
+# local文件夹下的访问方式
+# 如果只有一个配置，则url中无须表明name
+local:
+  - name: 'local'
+    path: '/tmp/'
+    urlPrefix: 'http://192.168.50.158:8888/api/v1/oss'
 
 # 认证
 auth:

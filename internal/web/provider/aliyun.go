@@ -1,11 +1,14 @@
 package provider
 
 import (
+	"bytes"
 	"fmt"
-	"github.com/damonchen/oss-server/internal/web/utils"
 	"io"
 	"net/http"
+	"path/filepath"
 	"strings"
+
+	"github.com/damonchen/oss-server/internal/web/utils"
 
 	"github.com/aliyun/aliyun-oss-go-sdk/oss"
 
@@ -25,9 +28,13 @@ func (f aliyun) Create(cfg *config.Configuration) []ProxyProvider {
 		}
 
 		proxy := &AliyunProxy{
-			client: client,
-			bucket: proxy.Bucket,
-			name:   proxy.Name,
+			client:   client,
+			endpoint: proxy.Endpoint,
+			appId:    proxy.ApiID,
+			appKey:   proxy.ApiKey,
+			region:   proxy.Region,
+			bucket:   proxy.Bucket,
+			name:     proxy.Name,
 		}
 
 		proxyProviders = append(proxyProviders, proxy)
@@ -37,9 +44,13 @@ func (f aliyun) Create(cfg *config.Configuration) []ProxyProvider {
 }
 
 type AliyunProxy struct {
-	client *oss.Client
-	bucket string
-	name   string
+	client   *oss.Client
+	endpoint string
+	appId    string
+	appKey   string
+	region   string
+	bucket   string
+	name     string
 }
 
 func (proxy *AliyunProxy) Handle(w http.ResponseWriter, req *http.Request) {
@@ -67,6 +78,41 @@ func (proxy *AliyunProxy) Handle(w http.ResponseWriter, req *http.Request) {
 
 	_, _ = io.Copy(w, body)
 	return
+}
+
+func (proxy *AliyunProxy) Upload(w http.ResponseWriter, req *http.Request) {
+	endpoint := proxy.endpoint
+	appId := proxy.appId
+	appKey := proxy.appKey
+
+	client, err := oss.New(endpoint, appId, appKey)
+	if err != nil {
+		// return nil, mistake.New500LogicErrorOnlyErr(err)
+		return
+	}
+	bucket, err := client.Bucket(proxy.bucket)
+	if err != nil {
+		// return nil, mistake.New500LogicErrorOnlyErr(err)
+		return
+	}
+
+	file, header, err := req.FormFile("file")
+	if err != nil {
+		return
+	}
+
+	// TODO 依据不同的业务（req.Kind）将文件上传至不同位置
+	var buf bytes.Buffer
+
+	ext := filepath.Ext(header.Filename)
+	fmt.Println(ext)
+	// village := middleware.MustVillageFromContext(l.ctx)
+	// objectKey := fmt.Sprintf("%s/%s%s", village.Name.String, uuid.NewV4().String(), )
+	objectKey := ""
+	if err = bucket.PutObject(objectKey, io.TeeReader(file, &buf)); err != nil {
+		// logx.Errorf("Upload file %q error: %s", objectKey, err)
+		// return nil, mistake.New500LogicErrorOnlyErr(err)
+	}
 }
 
 func (proxy *AliyunProxy) Name() string {

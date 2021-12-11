@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
 	"os"
+	"time"
 
 	"github.com/damonchen/oss-server/cmd/osv/cmd"
 	"github.com/damonchen/oss-server/internal/config"
@@ -19,6 +21,8 @@ func warning(format string, v ...interface{}) {
 }
 
 func main() {
+	rand.Seed(time.Now().UnixMilli())
+
 	cfg := new(config.Configuration)
 	cmd, err := cmd.NewRootCmd(cfg, os.Stdout, os.Args[1:])
 	if err != nil {

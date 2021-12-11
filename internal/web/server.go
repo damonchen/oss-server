@@ -2,8 +2,9 @@ package web
 
 import (
 	"fmt"
-	"github.com/damonchen/oss-server/internal/web/provider"
 	"net/http"
+
+	"github.com/damonchen/oss-server/internal/web/provider"
 
 	"github.com/go-chi/chi"
 	"github.com/op/go-logging"
@@ -59,12 +60,16 @@ func (svr *Server) Run() error {
 
 func (svr *Server) Handle(w http.ResponseWriter, req *http.Request) {
 	pvd := chi.URLParam(req, "provider")
-	log.Debugf("svr handle, provider %s", pvd)
 	if pvd == "" {
-		log.Error("provider is empty")
-		w.WriteHeader(500)
-		return
+		if len(svr.Cfg.Providers) == 1 {
+			pvd = svr.Cfg.Providers[0]
+		} else {
+			log.Error("provider is empty")
+			w.WriteHeader(500)
+			return
+		}
 	}
+	log.Debugf("svr handle, provider %s", pvd)
 
 	if !provider.IsSupportProxy(pvd) {
 		log.Errorf("not support provider %s provide", pvd)
@@ -80,6 +85,37 @@ func (svr *Server) Handle(w http.ResponseWriter, req *http.Request) {
 	}
 
 	proxyProvider.Handle(w, req)
+	return
+}
+
+func (svr *Server) Upload(w http.ResponseWriter, req *http.Request) {
+	pvd := chi.URLParam(req, "provider")
+	if pvd == "" {
+		if len(svr.Cfg.Providers) == 1 {
+			pvd = svr.Cfg.Providers[0]
+		} else {
+			log.Error("provider is empty")
+			w.WriteHeader(500)
+			return
+		}
+	}
+	log.Debugf("svr handle, provider %s", pvd)
+
+	if !provider.IsSupportProxy(pvd) {
+		log.Errorf("not support provider %s provide", pvd)
+		w.WriteHeader(500)
+		return
+	}
+
+	proxyProvider := provider.GetProxyProvider(pvd)
+	if proxyProvider == nil {
+		log.Error("proxy provider is nil")
+		w.WriteHeader(500)
+		return
+	}
+
+	log.Debugf("call proxy %s upload", pvd, proxyProvider)
+	proxyProvider.Upload(w, req)
 	return
 }
 

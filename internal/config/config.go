@@ -2,11 +2,12 @@ package config
 
 // Aliyun aliyun oss
 type Aliyun struct {
-	Name   string `yaml:"name"`
-	ApiID  string `yaml:"apiId"`
-	ApiKey string `yaml:"apiKey"`
-	Bucket string `yaml:"bucket"`
-	Region string `yaml:"region"`
+	Name     string `yaml:"name"`
+	Endpoint string `yaml:"endpoint"`
+	ApiID    string `yaml:"apiId"`
+	ApiKey   string `yaml:"apiKey"`
+	Bucket   string `yaml:"bucket"`
+	Region   string `yaml:"region"`
 }
 
 // Tencent tencent oss
@@ -17,6 +18,12 @@ type Tencent struct {
 	Bucket           string `yaml:"bucket"`
 	Region           string `yaml:"region"`
 	DefaultImagePath string `yaml:"defaultImagePath"`
+}
+
+type Local struct {
+	Name      string `yaml:"name"`
+	Path      string `yaml:"path"`
+	UrlPrefix string `yaml:"urlPrefix"`
 }
 
 // Auth auth for request
@@ -46,5 +53,6 @@ type Configuration struct {
 	Providers []string  `yaml:"providers"`
 	Aliyun    []Aliyun  `yaml:"aliyun,omitempty"`
 	Tencent   []Tencent `yaml:"tencent,omitempty"`
+	Local     []Local   `yaml:"local,omitempty"`
 	Auth      Auth      `yaml:"auth,omitempty"`
 }
