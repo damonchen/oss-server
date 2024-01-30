@@ -42,7 +42,7 @@ tencent:
 local:
   - name: 'local'
     path: '/tmp/'
-    urlPrefix: 'http://192.168.50.158:8888/api/v1/oss'
+    urlPrefix: 'https://damon.liangkeshu.com/api/v1/oss'
 
 # 认证
 auth:

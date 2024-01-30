@@ -8,11 +8,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/damonchen/oss-server/internal/web/utils"
-
 	"github.com/aliyun/aliyun-oss-go-sdk/oss"
-
 	"github.com/damonchen/oss-server/internal/config"
+	"github.com/damonchen/oss-server/internal/web/utils"
 )
 
 type aliyun struct{}
@@ -77,7 +75,7 @@ func (proxy *AliyunProxy) Handle(w http.ResponseWriter, req *http.Request) {
 	defer body.Close()
 
 	_, _ = io.Copy(w, body)
-	return
+
 }
 
 func (proxy *AliyunProxy) Upload(w http.ResponseWriter, req *http.Request) {
@@ -110,7 +108,7 @@ func (proxy *AliyunProxy) Upload(w http.ResponseWriter, req *http.Request) {
 	// objectKey := fmt.Sprintf("%s/%s%s", village.Name.String, uuid.NewV4().String(), )
 	objectKey := ""
 	if err = bucket.PutObject(objectKey, io.TeeReader(file, &buf)); err != nil {
-		// logx.Errorf("Upload file %q error: %s", objectKey, err)
+		log.Errorf("Upload file %q error: %s", objectKey, err)
 		// return nil, mistake.New500LogicErrorOnlyErr(err)
 	}
 }

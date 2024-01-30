@@ -2,14 +2,16 @@ package provider
 
 import (
 	"bytes"
-	"github.com/damonchen/oss-server/internal/web/handle"
 	"io"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
 
+	"github.com/h2non/filetype"
+
 	"github.com/damonchen/oss-server/internal/config"
+	"github.com/damonchen/oss-server/internal/web/handle"
 	"github.com/damonchen/oss-server/internal/web/utils"
 )
 
@@ -55,20 +57,40 @@ func (proxy *LocalProxy) Handle(w http.ResponseWriter, req *http.Request) {
 	log.Debugf("will response file %s", filename)
 
 	fp, err := os.OpenFile(filename, os.O_RDONLY, 0600)
+	if err != nil {
+		log.Errorf("read file path %s error %s", filename, err)
+		w.WriteHeader(500)
+		return
+	}
 
-	io.Copy(w, fp)
+	data, err := io.ReadAll(fp)
+	if err != nil {
+		log.Errorf("read file error %s", err)
+		w.WriteHeader(500)
+		return
+	}
+
+	buff := data[:100]
+	kind, _ := filetype.Match(buff)
+	if kind == filetype.Unknown {
+		w.Write(data)
+	} else {
+		w.Header().Add("Content-Type", kind.MIME.Value)
+		w.Write(data)
+	}
+
 }
 
 func (proxy *LocalProxy) Upload(w http.ResponseWriter, req *http.Request) {
 	// 本地路径的上传方式
-	file, header, err := req.FormFile("file")
+	file, _, err := req.FormFile("file")
 	if err != nil {
 		log.Errorf("request get file error %s", err)
 		handle.HandleError(w, err)
 		return
 	}
 
-	ext := filepath.Ext(header.Filename)
+	// ext := filepath.Ext(header.Filename)
 	randomString := utils.GetRandomString(64)
 	filename := utils.GetFilename(randomString)
 
@@ -88,7 +110,7 @@ func (proxy *LocalProxy) Upload(w http.ResponseWriter, req *http.Request) {
 		}
 	}
 
-	newFilename := filename[2:] + ext
+	newFilename := filename[2:]
 	newFilename = filepath.Join(dir, newFilename)
 
 	log.Debugf("will save file %s", newFilename)
